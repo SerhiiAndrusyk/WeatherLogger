@@ -1,0 +1,19 @@
+# STM32CubeIDE build output
+Debug/
+Release/
+
+# Compiled files
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.hex
+*.bin
+*.map
+*.list
+
+# Temporary files
+*.tmp
+*.bak
+*~
