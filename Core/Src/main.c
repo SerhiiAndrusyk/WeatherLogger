@@ -105,10 +105,6 @@ int main(void)
       if (status == SSD1306_OK) {
           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
       }
-      HAL_Delay(1000);
-      SSD1306_Clear();
-      SSD1306_UpdateScreen(&display);
-  }
   /* USER CODE END 2 */
 
   /* Infinite loop */

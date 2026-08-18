@@ -24,5 +24,12 @@ SSD1306_Status SSD1306_Init(SSD1306_Handle *display, I2C_HandleTypeDef *hi2c, ui
 SSD1306_Status SSD1306_Clear(void);
 SSD1306_Status SSD1306_UpdateScreen(SSD1306_Handle *display);
 SSD1306_Status SSD1306_DrawPixel(uint8_t x, uint8_t y, uint8_t color);
+SSD1306_Status SSD1306_DrawLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
+SSD1306_Status SSD1306_DrawRectangle(int16_t x, int16_t y, uint8_t width, uint8_t height, uint8_t color);
+SSD1306_Status SSD1306_FillRectangle(int16_t x, int16_t y, uint8_t width, uint8_t height, uint8_t color);
+SSD1306_Status SSD1306_DrawCircle(int16_t centerX, int16_t centerY, uint8_t radius, uint8_t color);
+SSD1306_Status SSD1306_FillCircle(int16_t centerX, int16_t centerY, uint8_t radius, uint8_t color);
+SSD1306_Status SSD1306_DrawEllipse(int16_t centerX, int16_t centerY, uint8_t radiusX, uint8_t radiusY, uint8_t color);
+SSD1306_Status SSD1306_FillEllipse(int16_t centerX, int16_t centerY, uint8_t radiusX, uint8_t radiusY, uint8_t color);
 
 #endif
