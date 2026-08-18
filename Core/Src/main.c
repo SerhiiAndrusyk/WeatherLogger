@@ -98,13 +98,10 @@ int main(void)
       SSD1306_Status status = SSD1306_Init(&display, &hi2c1, 0x3CU << 1U);
 
       if (status == SSD1306_OK) {
-          SSD1306_DrawPixel(10U, 10U, 1U);
-          status = SSD1306_UpdateScreen(&display);
-      }
-
-      if (status == SSD1306_OK) {
           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
       }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

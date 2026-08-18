@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include "stm32g4xx_hal.h"
+#include "bitmap.h"
+#include "font.h"
 
 #define SSD1306_WIDTH 128U
 #define SSD1306_HEIGHT 64U
@@ -31,5 +33,7 @@ SSD1306_Status SSD1306_DrawCircle(int16_t centerX, int16_t centerY, uint8_t radi
 SSD1306_Status SSD1306_FillCircle(int16_t centerX, int16_t centerY, uint8_t radius, uint8_t color);
 SSD1306_Status SSD1306_DrawEllipse(int16_t centerX, int16_t centerY, uint8_t radiusX, uint8_t radiusY, uint8_t color);
 SSD1306_Status SSD1306_FillEllipse(int16_t centerX, int16_t centerY, uint8_t radiusX, uint8_t radiusY, uint8_t color);
-
+SSD1306_Status SSD1306_DrawBitmap(int16_t x, int16_t y, const SSD1306_Bitmap *bitmap, uint8_t color);
+SSD1306_Status SSD1306_DrawChar(int16_t x, int16_t y, char character, const SSD1306_Font *font, uint8_t color);
+SSD1306_Status SSD1306_DrawString(int16_t x, int16_t y, const char *text, const SSD1306_Font *font, uint8_t color);
 #endif

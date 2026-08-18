@@ -457,3 +457,70 @@ SSD1306_Status SSD1306_FillEllipse(int16_t centerX, int16_t centerY, uint8_t rad
 
     return SSD1306_OK;
 }
+
+SSD1306_Status SSD1306_DrawBitmap(int16_t x, int16_t y, const SSD1306_Bitmap *bitmap, uint8_t color){
+    if ((bitmap == NULL) ||
+        (bitmap->data == NULL) ||
+        (bitmap->width == 0U) ||
+        (bitmap->height == 0U)){
+        return SSD1306_INVALID_ARGUMENT;
+    }
+
+    uint16_t bytesPerRow = (bitmap->width + 7U) / 8U;
+
+    for (uint16_t bitmapY = 0U; bitmapY < bitmap->height; bitmapY++){
+        for (uint16_t bitmapX = 0U; bitmapX < bitmap->width; bitmapX++){
+            uint32_t byteIndex = bitmapY * bytesPerRow + bitmapX / 8U;
+            uint8_t bitMask = 0x80U >> (bitmapX % 8U);
+
+            if ((bitmap->data[byteIndex] & bitMask) != 0U){
+                SSD1306_DrawPixelClipped(x + bitmapX, y + bitmapY, color);
+            }
+        }
+    }
+
+    return SSD1306_OK;
+}
+
+SSD1306_Status SSD1306_DrawChar(int16_t x, int16_t y, char character, const SSD1306_Font *font, uint8_t color){
+    if ((font == NULL) ||
+        (font->data == NULL) ||
+        (character < font->firstCharacter) ||
+        (character > font->lastCharacter)){
+        return SSD1306_INVALID_ARGUMENT;
+    }
+
+    uint16_t characterIndex = (uint16_t)(character - font->firstCharacter);
+    uint16_t dataIndex = characterIndex * font->width;
+
+    for (uint8_t column = 0U; column < font->width; column++){
+        uint8_t columnData = font->data[dataIndex + column];
+
+        for (uint8_t row = 0U; row < font->height; row++){
+            if ((columnData & (1U << row)) != 0U){
+                SSD1306_DrawPixelClipped(x + column, y + row, color);
+            }
+        }
+    }
+
+    return SSD1306_OK;
+}
+
+SSD1306_Status SSD1306_DrawString(int16_t x, int16_t y, const char *text, const SSD1306_Font *font, uint8_t color){
+    if ((text == NULL) || (font == NULL)){
+        return SSD1306_INVALID_ARGUMENT;
+    }
+
+    while (*text != '\0'){
+        SSD1306_Status status = SSD1306_DrawChar(x, y, *text, font, color);
+
+        if (status != SSD1306_OK){
+            return status;
+        }
+
+        x += font->width + 1;
+        text++;
+    }
+
+    return SSD1306_OK;
+}
