@@ -2,7 +2,7 @@
 #define SSD1306_H
 
 #include <stdint.h>
-#include "stm32g4xx_hal.h"
+#include "stm32u0xx_hal.h"
 #include "bitmap.h"
 #include "font.h"
 

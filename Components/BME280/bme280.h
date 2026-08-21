@@ -2,7 +2,7 @@
 #define BME280_H
 
 #include <stdint.h>
-#include "stm32g4xx_hal.h"
+#include "stm32u0xx_hal.h"
 
 typedef enum{
 	BME280_OK = 0,

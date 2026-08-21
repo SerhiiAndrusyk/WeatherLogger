@@ -2,7 +2,7 @@
 #define W25Q128_H
 
 #include <stdint.h>
-#include "stm32g4xx_hal.h"
+#include "stm32u0xx_hal.h"
 
 #define W25Q128_SIZE         16777216UL
 #define W25Q128_PAGE_SIZE         256U

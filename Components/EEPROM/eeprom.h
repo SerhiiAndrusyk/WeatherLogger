@@ -2,7 +2,7 @@
 #define EEPROM_H
 
 #include <stdint.h>
-#include "stm32g4xx_hal.h"
+#include "stm32u0xx_hal.h"
 
 #define EEPROM_SIZE       4096U
 #define EEPROM_PAGE_SIZE  32U
