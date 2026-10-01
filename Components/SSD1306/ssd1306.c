@@ -224,8 +224,8 @@ SSD1306_Status SSD1306_DrawLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, 
 }
 
 static void SSD1306_DrawPixelClipped(int16_t x, int16_t y, uint8_t color){
-	if ((x < 0) || (x >= SSD1306_WIDTH) ||
-		(y < 0) || (y >= SSD1306_HEIGHT)){
+	if ((x < 0) || (x >= (int16_t)SSD1306_WIDTH) ||
+		(y < 0) || (y >= (int16_t)SSD1306_HEIGHT)){
 		return;
 	}
 

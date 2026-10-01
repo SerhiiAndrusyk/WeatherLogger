@@ -14,4 +14,5 @@ extern const SSD1306_Bitmap SSD1306_BitmapSun;
 extern const SSD1306_Bitmap SSD1306_BitmapCloud;
 extern const SSD1306_Bitmap SSD1306_BitmapPartlyCloudy;
 
+
 #endif

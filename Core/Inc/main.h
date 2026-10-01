@@ -59,6 +59,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define FLASH_CS_Pin GPIO_PIN_5
 #define FLASH_CS_GPIO_Port GPIOA
+#define BUTTON_NEXT_Pin GPIO_PIN_6
+#define BUTTON_NEXT_GPIO_Port GPIOB
+#define BUTTON_NEXT_EXTI_IRQn EXTI4_15_IRQn
+#define BUTTON_BACK_Pin GPIO_PIN_7
+#define BUTTON_BACK_GPIO_Port GPIOB
+#define BUTTON_BACK_EXTI_IRQn EXTI4_15_IRQn
 
 /* USER CODE BEGIN Private defines */
 
