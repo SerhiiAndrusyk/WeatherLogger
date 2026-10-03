@@ -36,4 +36,6 @@ SSD1306_Status SSD1306_FillEllipse(int16_t centerX, int16_t centerY, uint8_t rad
 SSD1306_Status SSD1306_DrawBitmap(int16_t x, int16_t y, const SSD1306_Bitmap *bitmap, uint8_t color);
 SSD1306_Status SSD1306_DrawChar(int16_t x, int16_t y, char character, const SSD1306_Font *font, uint8_t color);
 SSD1306_Status SSD1306_DrawString(int16_t x, int16_t y, const char *text, const SSD1306_Font *font, uint8_t color);
+SSD1306_Status SSD1306_On(SSD1306_Handle *display);
+SSD1306_Status SSD1306_Off(SSD1306_Handle *display);
 #endif

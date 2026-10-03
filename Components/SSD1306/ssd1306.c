@@ -3,6 +3,8 @@
 
 #define SSD1306_CONTROL_COMMAND 0x00U
 #define SSD1306_CONTROL_DATA 0x40U
+#define SSD1306_ON 0xAFU
+#define SSD1306_OFF 0xAEU
 
 #define SSD1306_I2C_TIMEOUT_MS 1000U
 #define SSD1306_MAX_COMMAND_BYTES 32U
@@ -523,4 +525,16 @@ SSD1306_Status SSD1306_DrawString(int16_t x, int16_t y, const char *text, const 
     }
 
     return SSD1306_OK;
+}
+
+SSD1306_Status SSD1306_On(SSD1306_Handle *display){
+    const uint8_t command = SSD1306_ON;
+
+    return SSD1306_WriteCommand(display, &command, sizeof(command));
+}
+
+SSD1306_Status SSD1306_Off(SSD1306_Handle *display){
+    const uint8_t command = SSD1306_OFF;
+
+    return SSD1306_WriteCommand(display, &command, sizeof(command));
 }

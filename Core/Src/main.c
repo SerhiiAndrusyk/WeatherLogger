@@ -22,6 +22,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "display.h"
+#include "memory.h"
+#include "sensor.h"
+#include "logger.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 /* USER CODE END Includes */
 
@@ -32,7 +37,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define BUTTON_DEBOUNSE_MS 50U
+#define BUTTON_DOUBLECLICK_TIME 250U
+#define DISPLAY_TIMEOUT_MS 60000U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,7 +56,21 @@ RTC_HandleTypeDef hrtc;
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-volatile uint8_t displayTick = 0;
+volatile bool nextButtonPressed = false;
+volatile bool backButtonPressed = false;
+volatile bool nextButtonDoublePressed = false;
+volatile bool backButtonDoublePressed = false;
+static volatile bool sleepMode = false;
+static volatile bool measurementRequired = false;
+static volatile bool displayWakeRequested = false;
+static volatile uint32_t displayLastActivity = 0U;
+static uint32_t nextButtonLastTick = 0U;
+static uint32_t backButtonLastTick = 0U;
+static uint8_t mode = 0U;
+static uint16_t page = 0U;
+static bool displayActive = true;
+static uint16_t prevpage = 0U;
+static uint8_t prevmode = 0U;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,8 +122,10 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   DISPLAY_Init();
+  MemoryInit();
+  SensorInit();
+  displayLastActivity = HAL_GetTick();
   DISPLAY_WriteStart();
-  uint32_t LastTick = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -112,10 +135,82 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (HAL_GetTick() - LastTick > 50) {
-      LastTick = HAL_GetTick();
-      DISPLAY_ScrollWrite();
-    }
+	if (sleepMode){
+		displayActive = false;
+		sleepMode = false;
+		DISPLAY_Off();
+		HAL_SuspendTick();
+		HAL_PWREx_EnterSTOP2Mode(PWR_STOPENTRY_WFI);
+		HAL_ResumeTick();
+		SystemClock_Config();
+	}
+	if (displayWakeRequested && !displayActive){
+		displayActive = true;
+		DISPLAY_On();
+	}
+	if ((mode%4 == 0 && displayActive) && (mode != prevmode)){
+		prevmode = mode;
+		DISPLAY_WriteStart();
+	}
+	else if ((displayActive && mode%4 != 0) &&
+			((mode != prevmode) || (page != prevpage))){
+		prevmode = mode;
+		prevpage = page;
+		DISPLAY_WritePage(mode%4, page);
+	}
+	if (nextButtonPressed){
+		nextButtonPressed = false;
+		page++;
+	}
+	if (backButtonPressed){
+		backButtonPressed = false;
+		if (page > 0U){
+			page--;
+		}
+	}
+	if (nextButtonDoublePressed){
+		nextButtonDoublePressed = false;
+		if (mode%4 == 1){
+			page /= 24;
+		}
+		else if (mode%4 == 2){
+			page /= 30;
+		}
+		else if (mode%4 == 3){
+			page *= 720;
+		}
+		mode++;
+	}
+	if (backButtonDoublePressed){
+		backButtonDoublePressed = false;
+		if (mode%4 == 0){
+			sleepMode = true;
+			displayWakeRequested = false;
+			page = 0;
+		}
+		else{
+			if (mode%4 == 3){
+				page *= 30;
+			}
+			else if (mode%4 == 2){
+				page *= 24;
+			}
+			mode--;
+		}
+	}
+	if (measurementRequired){
+		measurementRequired = false;
+		Logger_Process();
+		if (!displayActive){
+			sleepMode = true;
+		}
+	}
+	if (displayActive && (HAL_GetTick() - displayLastActivity >= DISPLAY_TIMEOUT_MS)){
+		displayActive = false;
+		sleepMode = true;
+		displayWakeRequested = false;
+		DISPLAY_Off();
+	}
   }
   /* USER CODE END 3 */
 }
@@ -369,7 +464,55 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin){
+	uint32_t currentTick = HAL_GetTick();
+	if (GPIO_Pin == BUTTON_NEXT_Pin){
+		if (!displayWakeRequested){
+			displayWakeRequested = true;
+			nextButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+		else if ((currentTick - nextButtonLastTick) < BUTTON_DEBOUNSE_MS){
+		}
+		else if ((currentTick - nextButtonLastTick) > BUTTON_DOUBLECLICK_TIME){
+			nextButtonPressed = true;
+			nextButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+		else {
+			nextButtonDoublePressed = true;
+			nextButtonPressed = false;
+			nextButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+	}
+	if (GPIO_Pin == BUTTON_BACK_Pin){
+		if (!displayWakeRequested){
+			displayWakeRequested = true;
+			backButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+		else if ((currentTick - backButtonLastTick) < BUTTON_DEBOUNSE_MS){
+		}
+		else if ((currentTick - backButtonLastTick) > BUTTON_DOUBLECLICK_TIME){
+			backButtonPressed = true;
+			backButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+		else {
+			backButtonDoublePressed = true;
+			backButtonPressed = false;
+			backButtonLastTick = currentTick;
+			displayLastActivity = currentTick;
+		}
+	}
+}
 
+void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *rtc){
+	if (rtc == &hrtc){
+		measurementRequired = true;
+	}
+}
 /* USER CODE END 4 */
 
 /**
